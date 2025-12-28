@@ -1,0 +1,382 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  Menu, X, ChevronRight, BookOpen, Briefcase, 
+  Lightbulb, MapPin, Calendar, Users, Heart, 
+  Target, BarChart, GraduationCap, CheckCircle,
+  CreditCard, ArrowRight, XCircle, Copy, Map,
+  Monitor, Camera, Film, Zap, TrendingUp, Play
+} from 'lucide-react';
+
+const VTrackWebsite = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [activeLocation, setActiveLocation] = useState(null);
+  
+  // State untuk Donasi
+  const [donationAmount, setDonationAmount] = useState(100000);
+  const [customAmount, setCustomAmount] = useState('');
+  const [isDonationModalOpen, setIsDonationModalOpen] = useState(false);
+  const [donationTab, setDonationTab] = useState('individu'); // 'individu' or 'corporate'
+
+  // Data Lokasi 3T
+  const locations = [
+    { id: 1, name: "Nias Selatan", province: "Sumatera Utara", x: 15, y: 40, desc: "Target: 2 SD Pesisir" },
+    { id: 2, name: "Mentawai", province: "Sumatera Barat", x: 18, y: 50, desc: "Target: 1 SMP Satu Atap" },
+    { id: 3, name: "Sumba Tengah", province: "NTT", x: 55, y: 75, desc: "Daerah Pionir Utama" },
+    { id: 4, name: "Timor Tengah", province: "NTT", x: 62, y: 78, desc: "Pusat Pelatihan Guru" },
+    { id: 5, name: "Donggala", province: "Sulawesi Tengah", x: 50, y: 45, desc: "Pemulihan Pasca Bencana" },
+    { id: 6, name: "Halmahera", province: "Maluku Utara", x: 72, y: 35, desc: "Literasi Digital Maritim" },
+    { id: 7, name: "Supiori", province: "Papua", x: 88, y: 45, desc: "Target: 1 SMA Vokasi" },
+    { id: 8, name: "Peg. Bintang", province: "Papua Pegunungan", x: 92, y: 55, desc: "Akses Pendidikan Terluar" },
+  ];
+
+  // Handle scroll for navbar styling
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
+  const scrollToSection = (id) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      setIsMenuOpen(false);
+    }
+  };
+  
+  // --- Donasi Handlers ---
+  const handleDonationClick = (amount) => {
+    setDonationAmount(amount);
+    setCustomAmount('');
+  };
+
+  const handleCustomAmountChange = (e) => {
+    const val = e.target.value.replace(/\D/g, '');
+    setCustomAmount(val);
+    setDonationAmount(Number(val));
+  };
+
+  const openDonationModal = () => {
+    if (donationAmount > 0) {
+      setIsDonationModalOpen(true);
+    }
+  };
+
+  return (
+    <div className="font-sans text-slate-800 bg-slate-50 min-h-screen flex flex-col relative">
+      
+      {/* Donation Modal Overlay */}
+      {isDonationModalOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-blue-950/70 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-300">
+            <div className="bg-blue-800 p-4 flex justify-between items-center text-white">
+              <h3 className="font-bold text-lg flex items-center"><Heart className="mr-2 text-sky-300" fill="currentColor"/> Konfirmasi Donasi</h3>
+              <button onClick={() => setIsDonationModalOpen(false)} className="hover:text-sky-300 transition-colors"><XCircle /></button>
+            </div>
+            <div className="p-6">
+              <div className="mb-6 text-center">
+                <p className="text-slate-500 text-sm mb-1">Nominal Donasi Anda</p>
+                <h2 className="text-3xl font-bold text-blue-900">Rp {donationAmount.toLocaleString('id-ID')}</h2>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase mb-2">Metode Pembayaran</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button className="border-2 border-blue-600 bg-blue-50 text-blue-900 font-bold py-2 rounded-lg text-sm flex items-center justify-center">
+                      QRIS / E-Wallet
+                    </button>
+                    <button className="border border-slate-200 text-slate-500 py-2 rounded-lg text-sm hover:bg-slate-50">
+                      Transfer Bank
+                    </button>
+                  </div>
+                </div>
+
+                <div className="bg-slate-100 p-4 rounded-xl flex flex-col items-center justify-center border-2 border-dashed border-slate-300">
+                  <div className="w-32 h-32 bg-white mb-2 flex items-center justify-center shadow-sm">
+                    <img 
+                       src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=VTrackDonation" 
+                       alt="QR Code" 
+                       className="w-28 h-28"
+                    />
+                  </div>
+                  <p className="text-xs text-slate-500 text-center uppercase tracking-widest font-bold">QRIS V-TRACK</p>
+                </div>
+
+                <button 
+                  onClick={() => setIsDonationModalOpen(false)}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg transition-transform transform active:scale-95"
+                >
+                  Saya Sudah Membayar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Navigation */}
+      <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-lg py-2' : 'bg-transparent py-4'}`}>
+        <div className="container mx-auto px-4 md:px-8 flex justify-between items-center">
+          <div className="flex items-center space-x-2">
+            <div className="bg-blue-600 text-white p-2 rounded-lg shadow-md">
+              <span className="font-bold text-xl tracking-tighter">VT</span>
+            </div>
+            <span className={`text-2xl font-bold ${scrolled ? 'text-blue-900' : 'text-blue-900 md:text-white'}`}>V-Track</span>
+          </div>
+
+          <div className="hidden md:flex space-x-8">
+            {['Program', 'Roadmap', 'Peta 3T', 'Dampak', 'Donasi'].map((item) => (
+              <button 
+                key={item}
+                onClick={() => scrollToSection(item.toLowerCase().replace(' ', '-'))}
+                className={`font-medium hover:text-sky-400 transition-colors ${scrolled ? 'text-slate-600' : 'text-blue-100'}`}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+
+          <div className="md:hidden">
+            <button onClick={toggleMenu} className={`p-2 ${scrolled ? 'text-slate-800' : 'text-white'}`}>
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
+        </div>
+
+        {isMenuOpen && (
+          <div className="md:hidden bg-white shadow-xl absolute w-full top-full left-0 py-4 px-4 flex flex-col space-y-4">
+            {['Program', 'Roadmap', 'Peta 3T', 'Dampak', 'Donasi'].map((item) => (
+              <button 
+                key={item}
+                onClick={() => scrollToSection(item.toLowerCase().replace(' ', '-'))}
+                className="text-left py-2 text-slate-700 font-medium border-b border-slate-100"
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        )}
+      </nav>
+
+      {/* Hero Section */}
+      <header className="relative bg-gradient-to-r from-blue-900 to-sky-800 text-white pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute right-0 top-0 w-96 h-96 bg-sky-400 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
+        </div>
+        
+        <div className="container mx-auto px-4 md:px-8 relative z-10 text-center md:text-left">
+          <div className="md:w-2/3">
+            <div className="inline-block bg-blue-800/50 backdrop-blur-sm px-4 py-1 rounded-full text-sm font-semibold mb-6 border border-blue-400 text-sky-100">
+              Membangun Literasi Digital di Daerah 3T
+            </div>
+            <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6">
+              Membawa Masa Depan <br/>Melalui <span className="text-sky-400">Virtual Reality</span>
+            </h1>
+            <p className="text-lg md:text-xl text-blue-100 mb-8 leading-relaxed max-w-2xl">
+              V-Track hadir untuk memeratakan akses pendidikan berkualitas melalui pengalaman simulasi digital yang nyata bagi siswa di pelosok Indonesia.
+            </p>
+            <div className="flex flex-col md:flex-row gap-4">
+              <button onClick={() => scrollToSection('donasi')} className="bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 px-8 rounded-full shadow-lg flex items-center justify-center transition-all">
+                <Heart size={20} className="mr-2" /> Dukung Kami
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* MONITORING & DAMPAK SECTION (GALERI & VIDEO UPDATED) */}
+      <section className="py-24 bg-white" id="dampak">
+        <div className="container mx-auto px-4 md:px-8">
+            <div className="text-center mb-16">
+                <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-4 flex items-center justify-center">
+                    <Monitor className="mr-3 text-sky-500" size={32}/> Monitoring & Dampak Lapangan
+                </h2>
+                <p className="text-slate-600 max-w-2xl mx-auto italic font-medium">
+                  "Menghubungkan mereka yang terpisah oleh jarak, melalui teknologi tanpa batas."
+                </p>
+            </div>
+
+            {/* Statistik Ringkas */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-20">
+              <div className="bg-blue-50 p-6 rounded-2xl text-center">
+                <p className="text-3xl font-bold text-blue-600">8</p>
+                <p className="text-sm text-slate-500 font-bold uppercase tracking-tighter">Lokasi 3T</p>
+              </div>
+              <div className="bg-blue-50 p-6 rounded-2xl text-center">
+                <p className="text-3xl font-bold text-blue-600">1.2k+</p>
+                <p className="text-sm text-slate-500 font-bold uppercase tracking-tighter">Siswa Terjangkau</p>
+              </div>
+              <div className="bg-blue-50 p-6 rounded-2xl text-center">
+                <p className="text-3xl font-bold text-blue-600">45+</p>
+                <p className="text-sm text-slate-500 font-bold uppercase tracking-tighter">Volunteer Aktif</p>
+              </div>
+              <div className="bg-blue-50 p-6 rounded-2xl text-center">
+                <p className="text-3xl font-bold text-blue-600">12</p>
+                <p className="text-sm text-slate-500 font-bold uppercase tracking-tighter">Modul VR</p>
+              </div>
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-16 items-start">
+                
+                {/* Bagian Galeri: Visual Relawan & Anak-Anak */}
+                <div>
+                    <h3 className="text-2xl font-bold text-blue-900 mb-8 flex items-center">
+                      <Camera className="mr-3 text-blue-600"/> Galeri Kegiatan Lapangan
+                    </h3>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                        {/* Gambar Utama (Anak Belajar VR) */}
+                        <div className="col-span-2 relative h-64 rounded-3xl overflow-hidden shadow-2xl group">
+                            <img 
+                                src="https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1000&auto=format&fit=crop" 
+                                alt="Anak-anak belajar bersama relawan" 
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-blue-900/80 via-transparent to-transparent flex items-end p-6">
+                                <p className="text-white font-medium text-lg">Semangat literasi siswa di Sumba Tengah</p>
+                            </div>
+                        </div>
+
+                        {/* Volunteer & Field Activity */}
+                        <div className="h-44 rounded-2xl overflow-hidden shadow-lg group">
+                            <img 
+                                src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=500&auto=format&fit=crop" 
+                                alt="Kegiatan Volunteer" 
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            />
+                        </div>
+                        <div className="h-44 rounded-2xl overflow-hidden shadow-lg group">
+                            <img 
+                                src="https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=500&auto=format&fit=crop" 
+                                alt="Siswa gembira" 
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            />
+                        </div>
+                        
+                        {/* Deskripsi Singkat Galeri */}
+                        <div className="col-span-2 p-4 bg-slate-50 rounded-2xl border border-slate-100 mt-2">
+                          <p className="text-sm text-slate-600 leading-relaxed">
+                            <span className="font-bold text-blue-600">Dokumentasi Lapangan:</span> Relawan V-Track memberikan bimbingan intensif cara menggunakan headset VR untuk memvisualisasikan pelajaran sains dan geografi di kelas-kelas darurat daerah 3T.
+                          </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Bagian Video: Simulasi VR Imersif */}
+                <div>
+                    <h3 className="text-2xl font-bold text-blue-900 mb-8 flex items-center">
+                      <Film className="mr-3 text-red-500"/> Video Simulasi VR
+                    </h3>
+                    
+                    {/* Frame Video Player */}
+                    <div className="relative aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl group cursor-pointer">
+                        {/* Video Thumbnail Background */}
+                        <img 
+                          src="https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?q=80&w=1000&auto=format&fit=crop" 
+                          alt="Thumbnail Video VR"
+                          className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700"
+                        />
+                        
+                        {/* Overlay Content */}
+                        <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center p-6">
+                            <div className="w-20 h-20 bg-red-600/90 rounded-full flex items-center justify-center shadow-2xl group-hover:bg-red-500 group-hover:scale-110 transition-all duration-300 mb-4 border-4 border-white/20">
+                                <Play size={40} className="ml-2 fill-white" />
+                            </div>
+                            <h4 className="text-xl font-bold mb-1 shadow-sm">Simulasi: Menjelajahi Tata Surya</h4>
+                            <p className="text-blue-200 text-sm max-w-xs">Lihat apa yang siswa lihat saat mengenakan headset VR V-Track</p>
+                        </div>
+
+                        {/* Progress Bar Mockup */}
+                        <div className="absolute bottom-0 left-0 w-full h-1.5 bg-white/20">
+                          <div className="h-full bg-red-500 w-1/3 shadow-[0_0_10px_#ef4444]"></div>
+                        </div>
+                    </div>
+
+                    <div className="mt-8 space-y-6">
+                        <div className="flex gap-4 p-4 bg-white rounded-2xl shadow-sm border border-slate-100 items-start">
+                          <div className="bg-sky-100 p-2 rounded-lg text-sky-600">
+                            <Zap size={24}/>
+                          </div>
+                          <div>
+                            <h5 className="font-bold text-slate-800 text-sm">Visualisasi Sains 3D</h5>
+                            <p className="text-xs text-slate-500">Membantu siswa memahami orbit planet dan struktur sel secara nyata tanpa laboratorium fisik.</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-4 p-4 bg-white rounded-2xl shadow-sm border border-slate-100 items-start">
+                          <div className="bg-green-100 p-2 rounded-lg text-green-600">
+                            <Briefcase size={24}/>
+                          </div>
+                          <div>
+                            <h5 className="font-bold text-slate-800 text-sm">Simulasi Karir Imersif</h5>
+                            <p className="text-xs text-slate-500">Siswa bisa mencoba "menjadi" pilot, dokter, atau astronot dalam dunia virtual untuk memicu impian mereka.</p>
+                          </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </section>
+
+      {/* FOOTER & LAINNYA TETAP SAMA NAMUN DISESUAIKAN */}
+      {/* (Melanjutkan sisa kode dari versi sebelumnya agar tidak hilang) */}
+      <section className="py-20 bg-slate-900 text-white overflow-hidden relative" id="peta-3t">
+        {/* Konten Peta 3T (Tetap Sama) */}
+        <div className="container mx-auto px-4 md:px-8 relative z-10 text-center">
+          <h2 className="text-3xl font-bold mb-10">Target Sebaran Wilayah 3T</h2>
+          <div className="relative w-full aspect-[16/6] bg-slate-800/50 rounded-2xl border border-slate-700 p-4 md:p-8 overflow-hidden shadow-2xl">
+             <svg viewBox="0 0 800 300" className="w-full h-full text-slate-700 fill-current opacity-60">
+                <path d="M60,80 Q90,50 140,110 T190,160 Q160,180 120,160 T60,80 Z" />
+                <path d="M220,100 Q260,80 300,100 T320,160 Q280,180 240,160 T220,100 Z" />
+                <path d="M190,190 Q250,180 320,195 T360,205 Q300,220 200,210 Z" />
+                <path d="M360,100 Q380,80 400,100 L390,130 L420,120 L400,160 L380,150 Z" />
+                <path d="M560,120 Q620,100 680,120 T720,160 Q660,190 600,170 T560,120 Z" />
+             </svg>
+             {locations.map((loc) => (
+                <div key={loc.id} className="absolute group cursor-pointer" style={{ left: `${loc.x}%`, top: `${loc.y}%` }} onMouseEnter={() => setActiveLocation(loc)} onMouseLeave={() => setActiveLocation(null)}>
+                    <span className="absolute -inset-2 rounded-full bg-sky-500/30 animate-ping"></span>
+                    <span className="relative block w-3 h-3 bg-sky-500 rounded-full border-2 border-slate-900"></span>
+                    <div className={`absolute bottom-6 left-1/2 -translate-x-1/2 w-48 bg-white text-slate-800 p-3 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20`}>
+                        <h4 className="font-bold text-sm text-blue-900">{loc.name}</h4>
+                        <p className="text-xs text-slate-600">{loc.desc}</p>
+                    </div>
+                </div>
+             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20 bg-white" id="donasi">
+        <div className="container mx-auto px-4 md:px-8 text-center">
+           <h2 className="text-3xl font-bold text-slate-800 mb-6">Mari Berkontribusi</h2>
+           <div className="max-w-md mx-auto bg-slate-50 p-8 rounded-3xl border border-slate-200">
+              <div className="flex gap-2 justify-center mb-6">
+                {[100000, 250000, 500000].map(amt => (
+                  <button key={amt} onClick={() => handleDonationClick(amt)} className={`px-4 py-2 rounded-xl text-sm font-bold ${donationAmount === amt ? 'bg-blue-600 text-white' : 'bg-white text-slate-600'}`}>
+                    Rp{amt/1000}k
+                  </button>
+                ))}
+              </div>
+              <button onClick={openDonationModal} className="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-4 rounded-2xl shadow-lg transition-transform transform hover:-translate-y-1">
+                Donasi Sekarang
+              </button>
+           </div>
+        </div>
+      </section>
+
+      <footer className="bg-slate-900 text-slate-400 py-12 text-center">
+        <div className="container mx-auto px-4">
+            <h2 className="text-white font-bold text-xl mb-4 tracking-widest">V-TRACK COMPANY</h2>
+            <p className="text-sm">&copy; 2024 V-Track Indonesia. Misi Literasi untuk Negeri.</p>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default VTrackWebsite;
