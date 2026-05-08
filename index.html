@@ -350,7 +350,7 @@
 
       <!-- Tombol Spreadsheet -->
       <div class="flex justify-center mb-8">
-        <a href="https://docs.google.com/spreadsheets/d/19RB49NL4dqbkFLBeh_tvmnGoVgAwjOOKLlVuIkHUr1Q/edit?gid=688596925#gid=688596925"
+        <a href="<a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRTi46FfOUK3Xfamx79ZqppmqTdfZu0yKJvqReFq75mRsjJqixSu7Ysx5krR9rYiIjPDXVkaL-JxGM1/pub?output=csv"
            target="_blank"
            class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-2xl shadow-lg transition-all hover:-translate-y-1">
           <i data-lucide="external-link" class="w-5 h-5 mr-2"></i>
@@ -892,8 +892,7 @@
     // =====================================
     async function loadSpreadsheetData() {
       const CSV_URL =
-        "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTi46FfOUK3Xfamx79ZqppmqTdfZu0yKJvqReFq75mRsjJqixSu7Ysx5krR9rYiIjPDXVkaL-JxGM1/pub?output=csv";
-
+         "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTi46FfOUK3Xfamx79ZqppmqTdfZu0yKJvqReFq75mRsjJqixSu7Ysx5krR9rYiIjPDXVkaL-JxGM1/pub?output=csv";
       try {
         const response = await fetch(CSV_URL);
         const csvText = await response.text();
