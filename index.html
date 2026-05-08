@@ -431,6 +431,116 @@
 
 async function loadSpreadsheetData() {
 
+  const CSV_URL =
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTi46FfOUK3Xfamx79ZqppmqTdfZu0yKJvqReFq75mRsjJqixSu7Ysx5krR9rYiIjPDXVkaL-JxGM1/pub?output=csv";
+
+  try {
+
+    const response = await fetch(CSV_URL);
+    const csvText = await response.text();
+
+    const lines = csvText.trim().split("\n");
+
+    // Hapus header
+    lines.shift();
+
+    let html = "";
+
+    let totalAktif = 0;
+    let totalNilai = 0;
+    let totalProgress = 0;
+
+    const sekolahSet = new Set();
+
+    lines.forEach((line, index) => {
+
+      // CSV parser aman
+      const cols = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+
+      if (!cols) return;
+
+      const clean = cols.map(col =>
+        col.replace(/^"|"$/g, "").trim()
+      );
+
+      const nama = clean[1] || "-";
+      const sekolah = clean[2] || "-";
+      const jenjang = clean[3] || "-";
+      const lokasi = clean[4] || "-";
+      const modul = clean[5] || "-";
+
+      const nilai = parseInt(clean[6]) || 0;
+      const progress = parseInt(clean[7]) || 0;
+
+      const status = clean[10] || "-";
+
+      sekolahSet.add(sekolah);
+
+      if (status.toLowerCase().includes("aktif")) {
+        totalAktif++;
+      }
+
+      totalNilai += nilai;
+      totalProgress += progress;
+
+      html += `
+        <tr class="border-b border-slate-100 hover:bg-slate-50">
+
+          <td class="px-6 py-4 font-medium">
+            ${nama}
+          </td>
+
+          <td class="px-6 py-4">
+            ${sekolah}
+          </td>
+
+          <td class="px-6 py-4">
+            ${jenjang}
+          </td>
+
+          <td class="px-6 py-4">
+            ${lokasi}
+          </td>
+
+          <td class="px-6 py-4">
+            ${modul}
+          </td>
+
+          <td class="px-6 py-4 font-bold text-blue-700">
+            ${nilai}
+          </td>
+
+        </tr>
+      `;
+    });
+
+    document.getElementById("spreadsheet-body").innerHTML = html;
+
+    document.getElementById("total-siswa").innerText =
+      lines.length;
+
+    document.getElementById("aktif-siswa").innerText =
+      totalAktif;
+
+    document.getElementById("avg-nilai").innerText =
+      Math.round(totalNilai / lines.length);
+
+    document.getElementById("avg-progress").innerText =
+      Math.round(totalProgress / lines.length) + "%";
+
+  } catch (err) {
+
+    console.error(err);
+
+    document.getElementById("spreadsheet-body").innerHTML = `
+      <tr>
+        <td colspan="6" class="text-center py-10 text-red-500">
+          Gagal mengambil data spreadsheet.
+        </td>
+      </tr>
+    `;
+  }
+}
   try {
 
     // LINK CSV GOOGLE SHEET
