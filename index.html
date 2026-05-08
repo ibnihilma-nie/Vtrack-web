@@ -315,6 +315,377 @@
           </div>
         </div>
 
+        <!-- ========================= -->
+<!-- Monitoring Spreadsheet -->
+<!-- ========================= -->
+<section class="py-24 bg-slate-100" id="monitoring-spreadsheet">
+  <div class="container mx-auto px-4 md:px-8">
+
+    <div class="text-center mb-14">
+      <h2 class="text-3xl md:text-4xl font-bold text-slate-800 italic mb-4">
+        Monitoring Data Siswa V-Track
+      </h2>
+
+      <p class="text-slate-500 max-w-2xl mx-auto">
+        Data siswa terhubung langsung dengan spreadsheet monitoring realtime.
+      </p>
+    </div>
+
+    <!-- Statistik -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+
+      <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-200 text-center">
+        <p class="text-xs uppercase font-bold text-slate-500">
+          Total Siswa
+        </p>
+
+        <h3 id="total-siswa"
+            class="text-3xl font-bold text-blue-700 mt-2">
+          0
+        </h3>
+      </div>
+
+      <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-200 text-center">
+        <p class="text-xs uppercase font-bold text-slate-500">
+          Siswa Aktif
+        </p>
+
+        <h3 id="siswa-aktif"
+            class="text-3xl font-bold text-emerald-600 mt-2">
+          0
+        </h3>
+      </div>
+
+      <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-200 text-center">
+        <p class="text-xs uppercase font-bold text-slate-500">
+          Rata Nilai
+        </p>
+
+        <h3 id="rata-nilai"
+            class="text-3xl font-bold text-orange-500 mt-2">
+          0
+        </h3>
+      </div>
+
+      <div class="bg-white rounded-2xl p-6 shadow-md border border-slate-200 text-center">
+        <p class="text-xs uppercase font-bold text-slate-500">
+          Avg Progress
+        </p>
+
+        <h3 id="avg-progress"
+            class="text-3xl font-bold text-sky-500 mt-2">
+          0%
+        </h3>
+      </div>
+
+    </div>
+
+    <!-- Table -->
+    <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200">
+
+      <div class="overflow-x-auto">
+
+        <table class="w-full text-sm text-left">
+
+          <thead class="bg-blue-900 text-white uppercase text-xs tracking-wider">
+
+            <tr>
+              <th class="px-6 py-4">Nama</th>
+              <th class="px-6 py-4">Sekolah</th>
+              <th class="px-6 py-4">Jenjang</th>
+              <th class="px-6 py-4">Lokasi</th>
+              <th class="px-6 py-4">Modul VR</th>
+              <th class="px-6 py-4">Nilai</th>
+              <th class="px-6 py-4">Progress</th>
+              <th class="px-6 py-4">Status</th>
+            </tr>
+
+          </thead>
+
+          <tbody id="spreadsheet-body"
+                 class="divide-y divide-slate-100 bg-white">
+
+            <tr>
+              <td colspan="8"
+                  class="text-center py-8 text-slate-400">
+                Memuat data spreadsheet...
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<script>
+
+// =====================================
+// Spreadsheet Monitoring Integration
+// =====================================
+
+async function loadSpreadsheetData() {
+
+  try {
+
+    // LINK CSV GOOGLE SHEET
+    const csvUrl =
+      "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTi46FfOUK3Xfamx79ZqppmqTdfZu0yKJvqReFq75mRsjJqixSu7Ysx5krR9rYiIjPDXVkaL-JxGM1/pub?output=csv";
+
+    const response = await fetch(csvUrl);
+
+    const csvText = await response.text();
+
+    // Parsing CSV
+    const rows = csvText
+      .split("\n")
+      .map(row => row.split(","));
+
+    // Ambil data setelah header
+    const dataRows = rows.slice(1);
+
+    const tableBody =
+      document.getElementById("spreadsheet-body");
+
+    tableBody.innerHTML = "";
+
+    let totalNilai = 0;
+    let totalProgress = 0;
+    let aktif = 0;
+
+    dataRows.forEach(row => {
+
+      // Mapping Kolom Spreadsheet
+      const nama      = row[1] || "-";
+      const sekolah   = row[2] || "-";
+      const jenjang   = row[3] || "-";
+      const lokasi    = row[4] || "-";
+      const modul     = row[5] || "-";
+      const nilai     = parseInt(row[6]) || 0;
+      const progress  = parseInt(row[7]) || 0;
+      const status    = row[10] || "-";
+
+      totalNilai += nilai;
+      totalProgress += progress;
+
+      if (status.toLowerCase().includes("aktif")) {
+        aktif++;
+      }
+
+      const statusColor =
+        status.toLowerCase().includes("aktif")
+          ? "bg-emerald-100 text-emerald-700"
+          : "bg-red-100 text-red-700";
+
+      tableBody.innerHTML += `
+        <tr class="hover:bg-slate-50 transition-all">
+
+          <td class="px-6 py-4 font-semibold text-slate-700">
+            ${nama}
+          </td>
+
+          <td class="px-6 py-4">
+            ${sekolah}
+          </td>
+
+          <td class="px-6 py-4">
+            ${jenjang}
+          </td>
+
+          <td class="px-6 py-4">
+            ${lokasi}
+          </td>
+
+          <td class="px-6 py-4">
+            ${modul}
+          </td>
+
+          <td class="px-6 py-4 font-bold text-blue-700">
+            ${nilai}
+          </td>
+
+          <td class="px-6 py-4">
+
+            <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+
+              <div class="bg-sky-500 h-full rounded-full"
+                   style="width:${progress}%">
+              </div>
+
+            </div>
+
+            <span class="text-xs text-slate-500">
+              ${progress}%
+            </span>
+
+          </td>
+
+          <td class="px-6 py-4">
+
+            <span class="px-3 py-1 rounded-full text-xs font-bold ${statusColor}">
+              ${status}
+            </span>
+
+          </td>
+
+        </tr>
+      `;
+    });
+
+    // Statistik
+    document.getElementById("total-siswa")
+      .innerText = dataRows.length;
+
+    document.getElementById("siswa-aktif")
+      .innerText = aktif;
+
+    document.getElementById("rata-nilai")
+      .innerText =
+        Math.round(totalNilai / dataRows.length);
+
+    document.getElementById("avg-progress")
+      .innerText =
+        Math.round(totalProgress / dataRows.length) + "%";
+
+  }
+
+  catch (error) {
+
+    console.error(error);
+
+    document.getElementById("spreadsheet-body").innerHTML = `
+      <tr>
+        <td colspan="8"
+            class="text-center py-10 text-red-500 font-medium">
+          Gagal memuat data spreadsheet.
+        </td>
+      </tr>
+    `;
+  }
+}
+
+// Jalankan saat halaman dibuka
+// =========================
+// GOOGLE SHEET MONITORING
+// =========================
+
+async function loadSpreadsheetData() {
+
+  const CSV_URL =
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTi46FfOUK3Xfamx79ZqppmqTdfZu0yKJvqReFq75mRsjJqixSu7Ysx5krR9rYiIjPDXVkaL-JxGM1/pub?output=csv";
+
+  try {
+
+    const response = await fetch(CSV_URL);
+    const csvText = await response.text();
+
+    const rows = csvText.trim().split("\n");
+
+    // Hapus header
+    rows.shift();
+
+    let html = "";
+
+    let totalAktif = 0;
+    let totalNonaktif = 0;
+
+    const sekolahSet = new Set();
+
+    rows.forEach((row) => {
+
+      const cols = row.split(",");
+
+      const no = cols[0] || "-";
+      const nama = cols[1] || "-";
+      const sekolah = cols[2] || "-";
+      const wilayah = cols[3] || "-";
+      const status = cols[10] || "-";
+      const catatan = cols[11] || "-";
+
+      sekolahSet.add(sekolah);
+
+      if (status.toLowerCase().includes("aktif")) {
+        totalAktif++;
+      } else {
+        totalNonaktif++;
+      }
+
+      const badge =
+        status.toLowerCase().includes("aktif")
+          ? "bg-emerald-100 text-emerald-700"
+          : "bg-red-100 text-red-600";
+
+      html += `
+        <tr class="hover:bg-slate-50 transition-all">
+
+          <td class="px-6 py-4 font-semibold text-slate-500">
+            ${no}
+          </td>
+
+          <td class="px-6 py-4 font-bold text-blue-900">
+            ${nama}
+          </td>
+
+          <td class="px-6 py-4">
+            ${sekolah}
+          </td>
+
+          <td class="px-6 py-4">
+            ${wilayah}
+          </td>
+
+          <td class="px-6 py-4">
+            <span class="px-3 py-1 rounded-full text-xs font-bold ${badge}">
+              ${status}
+            </span>
+          </td>
+
+          <td class="px-6 py-4 text-slate-500">
+            ${catatan}
+          </td>
+
+        </tr>
+      `;
+    });
+
+    document.getElementById("spreadsheet-body").innerHTML = html;
+
+    document.getElementById("total-siswa").innerText =
+      rows.length;
+
+    document.getElementById("aktif-siswa").innerText =
+      totalAktif;
+
+    document.getElementById("nonaktif-siswa").innerText =
+      totalNonaktif;
+
+    document.getElementById("total-sekolah").innerText =
+      sekolahSet.size;
+
+  } catch (err) {
+
+    console.error(err);
+
+    document.getElementById("spreadsheet-body").innerHTML = `
+      <tr>
+        <td colspan="6" class="text-center py-10 text-red-500">
+          Gagal mengambil data spreadsheet.
+        </td>
+      </tr>
+    `;
+  }
+}
+  window.addEventListener("load", () => {
+  loadSpreadsheetData();
+});
+
+</script>
+        
         <!-- Video Simulasi -->
         <div>
           <h3 class="text-2xl font-bold text-blue-900 mb-8 flex items-center">
@@ -815,11 +1186,13 @@
       vrCamera.rotation.x = -y * 0.2;
     });
 
-    window.addEventListener("load", () => {
-      initVR3D();
-      resizeVR();
-      lucide.createIcons();
-    });
+window.addEventListener("load", () => {
+  initVR3D();
+  resizeVR();
+  lucide.createIcons();
+
+  loadSpreadsheetData();
+});
   </script>
 </body>
 </html>
