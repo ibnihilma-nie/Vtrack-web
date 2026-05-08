@@ -898,7 +898,12 @@
 
         const rows = csvText.trim().split("\n");
         /* hapus 8 baris awal */
-        const dataRows = rows.slice(8);
+        const dataRows = rows.filter(row => {
+          const firstCol = row.split(",")
+        [0]?.trim();
+          return !isNaN(firstCol) && firstCol !
+        == "";
+        });
         
         let html = "";
         let totalAktif = 0;
