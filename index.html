@@ -380,51 +380,63 @@
 
     </div>
 
-    <!-- Table -->
-    <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200">
+   <!-- Tombol Spreadsheet -->
+<div class="flex justify-center mb-8">
 
-      <div class="overflow-x-auto">
+  <a
+    href="https://docs.google.com/spreadsheets/d/19RB49NL4dqbkFLBeh_tvmnGoVgAwjOOKLlVuIkHUr1Q/edit?gid=688596925#gid=688596925"
+    target="_blank"
+    class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-2xl shadow-lg transition-all hover:-translate-y-1"
+  >
 
-        <table class="w-full text-sm text-left">
+    <i data-lucide="external-link" class="w-5 h-5 mr-2"></i>
 
-          <thead class="bg-blue-900 text-white uppercase text-xs tracking-wider">
+    Buka Dashboard Monitoring
 
-            <tr>
-              <th class="px-6 py-4">Nama</th>
-              <th class="px-6 py-4">Sekolah</th>
-              <th class="px-6 py-4">Jenjang</th>
-              <th class="px-6 py-4">Lokasi</th>
-              <th class="px-6 py-4">Modul VR</th>
-              <th class="px-6 py-4">Nilai</th>
-              <th class="px-6 py-4">Progress</th>
-              <th class="px-6 py-4">Status</th>
-            </tr>
+  </a>
 
-          </thead>
+</div>
 
-          <tbody id="spreadsheet-body"
-                 class="divide-y divide-slate-100 bg-white">
+<!-- Table -->
+<div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200">
 
-            <tr>
-              <td colspan="8"
-                  class="text-center py-8 text-slate-400">
-                Memuat data spreadsheet...
-              </td>
-            </tr>
+  <div class="overflow-x-auto">
 
-          </tbody>
+    <table class="w-full text-sm text-left">
 
-        </table>
+      <thead class="bg-blue-900 text-white uppercase text-xs tracking-wider">
 
-      </div>
+        <tr>
+          <th class="px-6 py-4">Nama</th>
+          <th class="px-6 py-4">Sekolah</th>
+          <th class="px-6 py-4">Jenjang</th>
+          <th class="px-6 py-4">Lokasi</th>
+          <th class="px-6 py-4">Modul VR</th>
+          <th class="px-6 py-4">Nilai</th>
+          <th class="px-6 py-4">Progress</th>
+          <th class="px-6 py-4">Status</th>
+        </tr>
 
-    </div>
+      </thead>
+
+      <tbody id="spreadsheet-body"
+             class="divide-y divide-slate-100 bg-white">
+
+        <tr>
+          <td colspan="8"
+              class="text-center py-8 text-slate-400">
+            Memuat data spreadsheet...
+          </td>
+        </tr>
+
+      </tbody>
+
+    </table>
 
   </div>
-</section>
 
-<script>
-
+</div>
+    
 // =====================================
 // Spreadsheet Monitoring Integration
 // =====================================
