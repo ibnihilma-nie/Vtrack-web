@@ -897,14 +897,15 @@
         const csvText = await response.text();
 
         const rows = csvText.trim().split("\n");
-        rows.shift(); // Hapus header
-
+        /* hapus 8 baris awal */
+        const dataRows = rows.slice(8);
+        
         let html = "";
         let totalAktif = 0;
         let totalNonaktif = 0;
         const sekolahSet = new Set();
 
-        rows.forEach((row) => {
+        datarows.forEach((row) => {
           const cols = row.split(",");
           const no       = cols[0] || "-";
           const nama     = cols[1] || "-";
@@ -940,7 +941,7 @@
         });
 
         document.getElementById("spreadsheet-body").innerHTML = html;
-        document.getElementById("total-siswa").innerText = rows.length;
+        document.getElementById("total-siswa").innerText = datarows.length;
         document.getElementById("aktif-siswa").innerText = totalAktif;
         document.getElementById("nonaktif-siswa").innerText = totalNonaktif;
         document.getElementById("total-sekolah").innerText = sekolahSet.size;
