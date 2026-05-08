@@ -431,18 +431,16 @@
 
 async function loadSpreadsheetData() {
 
-  const CSV_URL =
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTi46FfOUK3Xfamx79ZqppmqTdfZu0yKJvqReFq75mRsjJqixSu7Ysx5krR9rYiIjPDXVkaL-JxGM1/pub?output=csv";
+  const SHEET_ID = "19RB49NL4dqbkFLBeh_tvmnGoVgAwjOOKLlVuIkHUr1Q";
+  const SHEET_NAME = "Data Siswa";
+
+  const url =
+    `https://opensheet.elk.sh/${SHEET_ID}/${encodeURIComponent(SHEET_NAME)}`;
 
   try {
 
-    const response = await fetch(CSV_URL);
-    const csvText = await response.text();
-
-    const lines = csvText.trim().split("\n");
-
-    // Hapus header
-    lines.shift();
+    const response = await fetch(url);
+    const data = await response.json();
 
     let html = "";
 
@@ -452,27 +450,18 @@ async function loadSpreadsheetData() {
 
     const sekolahSet = new Set();
 
-    lines.forEach((line, index) => {
+    data.forEach((row, index) => {
 
-      // CSV parser aman
-      const cols = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+      const nama = row["Nama Siswa"] || "-";
+      const sekolah = row["Sekolah"] || "-";
+      const jenjang = row["Jenjang"] || "-";
+      const lokasi = row["Wilayah"] || "-";
+      const modul = row["Modul VR"] || "-";
 
-      if (!cols) return;
+      const nilai = parseInt(row["Nilai"]) || 0;
+      const progress = parseInt(row["Progress"]) || 0;
 
-      const clean = cols.map(col =>
-        col.replace(/^"|"$/g, "").trim()
-      );
-
-      const nama = clean[1] || "-";
-      const sekolah = clean[2] || "-";
-      const jenjang = clean[3] || "-";
-      const lokasi = clean[4] || "-";
-      const modul = clean[5] || "-";
-
-      const nilai = parseInt(clean[6]) || 0;
-      const progress = parseInt(clean[7]) || 0;
-
-      const status = clean[10] || "-";
+      const status = row["Status"] || "-";
 
       sekolahSet.add(sekolah);
 
@@ -483,8 +472,13 @@ async function loadSpreadsheetData() {
       totalNilai += nilai;
       totalProgress += progress;
 
+      const badge =
+        status.toLowerCase().includes("aktif")
+          ? "bg-emerald-100 text-emerald-700"
+          : "bg-red-100 text-red-600";
+
       html += `
-        <tr class="border-b border-slate-100 hover:bg-slate-50">
+        <tr class="border-b border-slate-100 hover:bg-slate-50 transition-all">
 
           <td class="px-6 py-4 font-medium">
             ${nama}
@@ -510,10 +504,47 @@ async function loadSpreadsheetData() {
             ${nilai}
           </td>
 
+          <td class="px-6 py-4">
+            ${progress}%
+          </td>
+
+          <td class="px-6 py-4">
+            <span class="px-3 py-1 rounded-full text-xs font-bold ${badge}">
+              ${status}
+            </span>
+          </td>
+
         </tr>
       `;
     });
 
+    document.getElementById("spreadsheet-body").innerHTML = html;
+
+    document.getElementById("total-siswa").innerText =
+      data.length;
+
+    document.getElementById("aktif-siswa").innerText =
+      totalAktif;
+
+    document.getElementById("avg-nilai").innerText =
+      Math.round(totalNilai / data.length);
+
+    document.getElementById("avg-progress").innerText =
+      Math.round(totalProgress / data.length) + "%";
+
+  } catch (err) {
+
+    console.error(err);
+
+    document.getElementById("spreadsheet-body").innerHTML = `
+      <tr>
+        <td colspan="8" class="text-center py-10 text-red-500">
+          Gagal mengambil data spreadsheet.
+        </td>
+      </tr>
+    `;
+  }
+}
     document.getElementById("spreadsheet-body").innerHTML = html;
 
     document.getElementById("total-siswa").innerText =
