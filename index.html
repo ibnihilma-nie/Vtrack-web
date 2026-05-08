@@ -443,33 +443,88 @@
 
 async function loadSpreadsheetData() {
 
-  const CSV_URL =
-    "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTi46FfOUK3Xfamx79ZqppmqTdfZu0yKJvqReFq75mRsjJqixSu7Ysx5krR9rYiIjPDXVkaL-JxGM1/pub?output=csv";
+  const SHEET_ID = "19RB49NL4dqbkFLBeh_tvmnGoVgAwjOOKLlVuIkHUr1Q";
+  const SHEET_NAME = "Data Siswa";
+
+  const url =
+    `https://opensheet.elk.sh/${SHEET_ID}/${encodeURIComponent(SHEET_NAME)}`;
 
   try {
 
-    const response = await fetch(CSV_URL);
-    const text = await response.text();
-
-    const rows = text.trim().split("\n").slice(1);
+    const response = await fetch(url);
+    const data = await response.json();
 
     let html = "";
 
-    rows.forEach((row) => {
+    let totalAktif = 0;
+    let totalNilai = 0;
+    let totalProgress = 0;
 
-      const cols = row.split(",");
+    const sekolahSet = new Set();
+
+    data.forEach((row, index) => {
+
+      const nama = row["Nama Siswa"] || "-";
+      const sekolah = row["Sekolah"] || "-";
+      const jenjang = row["Jenjang"] || "-";
+      const lokasi = row["Wilayah"] || "-";
+      const modul = row["Modul VR"] || "-";
+
+      const nilai = parseInt(row["Nilai"]) || 0;
+      const progress = parseInt(row["Progress"]) || 0;
+
+      const status = row["Status"] || "-";
+
+      sekolahSet.add(sekolah);
+
+      if (status.toLowerCase().includes("aktif")) {
+        totalAktif++;
+      }
+
+      totalNilai += nilai;
+      totalProgress += progress;
+
+      const badge =
+        status.toLowerCase().includes("aktif")
+          ? "bg-emerald-100 text-emerald-700"
+          : "bg-red-100 text-red-600";
 
       html += `
-        <tr class="hover:bg-slate-50">
+        <tr class="border-b border-slate-100 hover:bg-slate-50 transition-all">
 
-          <td class="px-6 py-4">${cols[0] || "-"}</td>
-          <td class="px-6 py-4">${cols[1] || "-"}</td>
-          <td class="px-6 py-4">${cols[2] || "-"}</td>
-          <td class="px-6 py-4">${cols[3] || "-"}</td>
-          <td class="px-6 py-4">${cols[4] || "-"}</td>
-          <td class="px-6 py-4 font-bold text-blue-700">${cols[5] || "-"}</td>
-          <td class="px-6 py-4">${cols[6] || "-"}%</td>
-          <td class="px-6 py-4">${cols[7] || "-"}</td>
+          <td class="px-6 py-4 font-medium">
+            ${nama}
+          </td>
+
+          <td class="px-6 py-4">
+            ${sekolah}
+          </td>
+
+          <td class="px-6 py-4">
+            ${jenjang}
+          </td>
+
+          <td class="px-6 py-4">
+            ${lokasi}
+          </td>
+
+          <td class="px-6 py-4">
+            ${modul}
+          </td>
+
+          <td class="px-6 py-4 font-bold text-blue-700">
+            ${nilai}
+          </td>
+
+          <td class="px-6 py-4">
+            ${progress}%
+          </td>
+
+          <td class="px-6 py-4">
+            <span class="px-3 py-1 rounded-full text-xs font-bold ${badge}">
+              ${status}
+            </span>
+          </td>
 
         </tr>
       `;
@@ -477,22 +532,32 @@ async function loadSpreadsheetData() {
 
     document.getElementById("spreadsheet-body").innerHTML = html;
 
-  } catch (error) {
+    document.getElementById("total-siswa").innerText =
+      data.length;
 
-    console.error(error);
+    document.getElementById("aktif-siswa").innerText =
+      totalAktif;
+
+    document.getElementById("avg-nilai").innerText =
+      Math.round(totalNilai / data.length);
+
+    document.getElementById("avg-progress").innerText =
+      Math.round(totalProgress / data.length) + "%";
+
+  } catch (err) {
+
+    console.error(err);
 
     document.getElementById("spreadsheet-body").innerHTML = `
       <tr>
-        <td colspan="8" class="text-center py-8 text-red-500">
-          Gagal memuat spreadsheet
+        <td colspan="8" class="text-center py-10 text-red-500">
+          Gagal mengambil data spreadsheet.
         </td>
       </tr>
     `;
   }
-}
-
-loadSpreadsheetData();
-
+}    
+    
     // LINK CSV GOOGLE SHEET
     const csvUrl =
       "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTi46FfOUK3Xfamx79ZqppmqTdfZu0yKJvqReFq75mRsjJqixSu7Ysx5krR9rYiIjPDXVkaL-JxGM1/pub?output=csv";
