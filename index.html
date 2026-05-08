@@ -899,8 +899,7 @@
         const rows = csvText.trim().split("\n");
 
         const dataRows = rows.filter(row => {
-          const firstCol = row.split(",")
-        [0].trim();
+          const firstCol = row.split(",") [0].trim();
           return Number(firstCol) > 0;
         });
         
@@ -909,7 +908,7 @@
         let totalNonaktif = 0;
         const sekolahSet = new Set();
 
-        datarows.forEach((row) => {
+        dataRows.forEach((row) => {
           const cols = row.split(",");
           const no       = cols[0] || "-";
           const nama     = cols[1] || "-";
@@ -945,7 +944,7 @@
         });
 
         document.getElementById("spreadsheet-body").innerHTML = html;
-        document.getElementById("total-siswa").innerText = datarows.length;
+        document.getElementById("total-siswa").innerText = dataRows.length;
         document.getElementById("aktif-siswa").innerText = totalAktif;
         document.getElementById("nonaktif-siswa").innerText = totalNonaktif;
         document.getElementById("total-sekolah").innerText = sekolahSet.size;
